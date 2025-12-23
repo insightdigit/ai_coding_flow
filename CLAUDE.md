@@ -2,18 +2,11 @@
 
 > Laravel 12 + Blade + Tailwind CSS 全端開發指南
 >
-> **版本:** 2.0 | **最後更新:** 2025-11-14
+> **版本:** 3.0 | **最後更新:** 2025-12-19
 
 ---
 
-## 🎯 專案概覽
-
-### 基本資訊
-* **開發框架:** Laravel 12 全端開發專案
-* **開發語言:** 繁體中文（文檔與註解）、英文（程式碼）
-* **AI 互動模式:** 您(AI)必須扮演資深 Laravel 全端開發者，提供 100% 符合本規範的可運作程式碼
-
-### 技術堆疊
+## 專案概覽
 
 | 類別 | 技術 | 版本 |
 |-----|------|------|
@@ -24,31 +17,33 @@
 | **前端模板** | Blade | - |
 | **前端樣式** | Tailwind CSS | - |
 
+**開發語言:** 繁體中文（文檔與註解）、英文（程式碼）
+
 ---
 
-## 📝 核心原則（必讀）
+## 核心原則（必讀）
 
 ### 安全第一
-- ✅ 使用 Eloquent ORM (禁止原生 SQL)
-- ✅ 使用 `{{ $var }}` 輸出 (避免 XSS)
-- ✅ 使用 FormRequest 驗證
-- ✅ Model 必須定義 `$fillable` 或 `$guarded`
+- 使用 Eloquent ORM（禁止原生 SQL）
+- 使用 `{{ $var }}` 輸出（避免 XSS）
+- 使用 FormRequest 驗證
+- Model 必須定義 `$fillable` 或 `$guarded`
 
 ### 分層架構
-- ✅ Controller：只處理 HTTP 請求和回應
-- ✅ Service：包含所有商業邏輯
-- ✅ Repository：只處理資料庫操作
-- ❌ 禁止在 Controller 中直接操作 Model
+- **Controller**：只處理 HTTP 請求和回應
+- **Service**：包含所有商業邏輯
+- **Repository**：只處理資料庫操作
+- 禁止在 Controller 中直接操作 Model
 
 ### 程式碼品質
-- ✅ 每行程式碼附繁體中文註解
-- ✅ 使用 try-catch 錯誤處理
-- ✅ 使用事務確保資料一致性
-- ✅ 使用 4 個空格縮排（禁止 Tab）
+- 每行程式碼附繁體中文註解
+- 使用 try-catch 錯誤處理
+- 使用事務確保資料一致性
+- 使用 4 個空格縮排（禁止 Tab）
 
 ---
 
-## 🔍 命名規範速查
+## 命名規範速查
 
 ```
 類別/介面          → PascalCase          (ProductController)
@@ -65,25 +60,20 @@ PHP 類別檔案      → PascalCase.php       (ProductController.php)
 
 ---
 
-## 🚨 前端開發強制規則
-
-### 共用組件優先使用
+## 前端開發強制規則
 
 **開發任何 UI 前，必須：**
+1. 執行 `/components` 查看可用組件
+2. 優先使用共用組件（位於 `resources/views/components/`）
+3. 只有在完全無法滿足需求時，才創建新組件
 
-1. **執行 `/components` 查看可用組件**
-2. **優先使用共用組件**（位於 `resources/views/components/`）
-3. **只有在完全無法滿足需求時，才創建新組件**
-
-**絕對禁止：**
-- ❌ 不檢查就開始寫 UI
-- ❌ 手動寫 `<input>`, `<textarea>`, `<select>` 等表單元素
-- ❌ 手動寫操作按鈕（查看/編輯/刪除）
-- ❌ 在模組資料夾內創建重複的通用 UI 組件
+**禁止：**
+- 不檢查就開始寫 UI
+- 手動寫 `<input>`, `<textarea>`, `<select>` 等表單元素
+- 手動寫操作按鈕（查看/編輯/刪除）
 
 **正確做法：**
 ```blade
-{{-- ✅ 使用共用組件 --}}
 <x-forms.text-input name="name" label="產品名稱" :value="old('name')" required />
 <x-forms.select-field name="category_id" label="分類" :options="$categories" />
 <x-action-buttons :view-url="..." :edit-url="..." :delete-url="..." />
@@ -91,63 +81,9 @@ PHP 類別檔案      → PascalCase.php       (ProductController.php)
 
 ---
 
-## 🔄 開發工作流程
+## 常用範例
 
-### 三大支柱
-
-| 工具 | 用途 | 適用場景 |
-|-----|------|---------|
-| **Spec-Kit** | 規格化文件與任務管理 | 新功能開發、重構 |
-| **Agents** | 專業化開發代理 | 程式碼實作、測試、審查 |
-| **MCP 工具** | 程式碼生成與規範檢查 | 所有程式碼生成 |
-
-### 快速指令
-
-**新功能開發:**
-```bash
-/speckit.specify [描述] → /speckit.plan → /speckit.tasks → /speckit.implement
-```
-
-**Bug 修復:**
-```bash
-researcher → tester → coder → reviewer
-```
-
-**重構（TDD）:**
-```bash
-/speckit.specify → tester (回歸測試) → coder (重構) → reviewer
-```
-
-**UI 開發:**
-```bash
-/components (必須) → coder → reviewer
-```
-
----
-
-## 📚 詳細規範索引
-
-所有詳細規範文件位於 `.claude/standards/` 目錄：
-
-### 核心規範
-- **[命名規範](./.claude/standards/naming.md)** - 完整的命名規則
-- **[程式碼風格](./.claude/standards/coding-style.md)** - 縮排、註解、類別結構
-- **[安全規範](./.claude/standards/security.md)** - SQL 注入、XSS、輸入驗證
-- **[架構模式](./.claude/standards/architecture.md)** - 三層架構、資料庫操作
-
-### 前端規範
-- **[前端開發](./.claude/standards/frontend.md)** - Blade、Tailwind、JavaScript
-- **[共用組件](./.claude/standards/components.md)** - 組件使用規範（強制）
-
-### 流程規範
-- **[工作流程](./.claude/standards/workflow.md)** - Spec-Kit、Agents、MCP
-- **[快速參考](./.claude/standards/quick-ref.md)** - 速查表
-
----
-
-## ⚡ 常用範例
-
-### Controller 範例
+### Controller
 ```php
 class ProductController extends Controller
 {
@@ -160,16 +96,14 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        // 只負責接收請求和返回回應
         $filters = $request->only(['category_id', 'keyword']);
         $products = $this->product_service->getProductList($filters);
-
         return view('products.index', compact('products'));
     }
 }
 ```
 
-### Service 範例
+### Service
 ```php
 class ProductService
 {
@@ -177,77 +111,78 @@ class ProductService
 
     public function getProductList(array $filters = [])
     {
-        // 商業邏輯處理
         return $this->product_repository->getFilteredProducts($filters);
     }
 }
 ```
 
-### Blade 表單範例（使用共用組件）
-```blade
-<form method="POST" action="{{ route('products.store') }}">
-    @csrf
+---
 
-    <x-section-card title="基本資訊">
-        <x-forms.text-input name="name" label="產品名稱" required />
-        <x-forms.select-field name="category_id" label="分類" :options="$categories" />
-    </x-section-card>
+## 工具清單
 
-    <div class="flex justify-end space-x-4 mt-6">
-        <x-back-button url="{{ route('products.index') }}" />
-        <x-button type="primary">建立產品</x-button>
-    </div>
-</form>
-```
+### Slash Commands（明確調用）
+| 指令 | 用途 |
+|-----|------|
+| `/bdd` | 定義行為需求（Gherkin） |
+| `/components` | 列出可用共用組件 |
+| `/tdd` | 測試驅動開發 |
+| `/impact-analysis` | 分析變更影響範圍 |
+| `/review-staged` | 審查 Git 暫存區 |
+
+### MCP 工具
+| 工具 | 用途 |
+|-----|------|
+| Sequential Thinking | 結構化思考、問題分解 |
+| tailwindcss-mcp-server | Tailwind CSS 生成 |
+
+### Agents
+| Agent | 用途 |
+|-------|------|
+| researcher | 分析現有程式碼 |
+| tester | 撰寫測試 |
+| coder | 實作程式碼 |
+| reviewer | 程式碼審查 |
 
 ---
 
-## 🎯 三大開發原則
+## 詳細規範索引
 
-1. **文件驅動** - 先寫規格 (Spec-Kit)，再寫程式碼
-2. **測試先行** - TDD 確保品質，測試覆蓋率 >80%
-3. **持續審查** - 程式碼必須經過 reviewer 才能合併
+所有詳細規範文件位於 `.claude/standards/` 目錄：
+
+- **[命名規範](/.claude/standards/naming.md)**
+- **[程式碼風格](/.claude/standards/coding-style.md)**
+- **[安全規範](/.claude/standards/security.md)**
+- **[架構模式](/.claude/standards/architecture.md)**
+- **[前端開發](/.claude/standards/frontend.md)**
+- **[共用組件](/.claude/standards/components.md)**
 
 ---
 
-## 📁 專案結構
+## 專案結構
 
 ```
 laravel-project/
 ├── .claude/
-│   ├── standards/         # 📚 詳細規範文件（本次新增）
+│   ├── skills/           # AI Skills（自動觸發的工作流程）
+│   ├── commands/         # Slash Commands（明確調用）
 │   ├── agents/           # AI Agents 定義
-│   └── commands/         # Slash Commands
+│   └── standards/        # 詳細規範文件
 ├── app/
-│   ├── Http/Controllers/ # Controller 層
-│   ├── Services/         # Service 層（商業邏輯）
-│   ├── Repositories/     # Repository 層（資料存取）
-│   └── Models/           # Eloquent Models
+│   ├── Http/Controllers/
+│   ├── Services/
+│   ├── Repositories/
+│   └── Models/
 ├── resources/views/
-│   └── components/       # 🚨 共用組件（優先使用）
-├── specs/                # Spec-Kit 規格文件
-└── tests/                # 測試檔案
+│   └── components/       # 共用組件
+└── tests/
 ```
 
 ---
 
-## 📞 遇到問題時
-
-1. 先查閱 [快速參考](./.claude/standards/quick-ref.md)
-2. 查看對應的詳細規範文件（`.claude/standards/`）
-3. 使用 `/speckit.clarify` 澄清需求
-4. 參考 `specs/` 目錄的相關規格文件
-
----
-
-**祝開發順利！** 🚀
-
----
-
-**文件版本:** 2.0
-**最後更新:** 2025-11-14
-**維護者:** 技術團隊
+**文件版本:** 3.0
+**最後更新:** 2025-12-19
 
 **變更記錄:**
-- v2.0 (2025-11-14): 拆分為模組化文件結構，提升效能
-- v1.0 (2025-11-09): 初始版本
+- v3.0 (2025-12-19): 重構為 Skills 架構，大幅精簡 CLAUDE.md
+- v2.3 (2025-12-17): 新增「AI 工具自動化規則」
+- v2.0 (2025-11-14): 拆分為模組化文件結構

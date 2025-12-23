@@ -2,6 +2,93 @@
 
 ---
 
+## 設計原則：高內聚低耦合
+
+### 高內聚 (High Cohesion)
+
+**定義：** 模組內的元素應該緊密相關，共同完成單一明確的職責。
+
+**檢查清單：**
+- ✅ 類別只負責單一職責（SRP）
+- ✅ 方法只做一件事，且做好
+- ✅ 相關功能集中在同一模組
+- ✅ 類別名稱能準確描述其職責
+- ❌ 避免「萬能類別」（God Class）
+- ❌ 避免方法超過 50 行
+
+**範例：**
+```php
+// ✅ 高內聚：ProductService 只處理產品相關邏輯
+class ProductService
+{
+    public function createProduct(array $data) { }
+    public function updateProduct(int $id, array $data) { }
+    public function deleteProduct(int $id) { }
+    public function getProductList(array $filters) { }
+}
+
+// ❌ 低內聚：混合不相關的職責
+class ProductService
+{
+    public function createProduct(array $data) { }
+    public function sendEmail(string $to, string $subject) { }  // 不相關
+    public function generateReport() { }  // 不相關
+}
+```
+
+### 低耦合 (Low Coupling)
+
+**定義：** 模組間應該減少依賴，透過抽象介面溝通。
+
+**檢查清單：**
+- ✅ 使用依賴注入（DI）而非直接 `new`
+- ✅ 依賴抽象（介面）而非具體實作
+- ✅ 模組間透過明確介面溝通
+- ✅ 避免循環依賴
+- ❌ 禁止在 Service 中直接 `new` 其他 Service
+- ❌ 禁止跨層直接存取（Controller 不能直接用 Repository）
+
+**範例：**
+```php
+// ✅ 低耦合：透過建構函式注入依賴
+class ProductService
+{
+    private ProductRepositoryInterface $product_repository;
+    private NotificationServiceInterface $notification_service;
+
+    public function __construct(
+        ProductRepositoryInterface $product_repository,
+        NotificationServiceInterface $notification_service
+    ) {
+        $this->product_repository = $product_repository;
+        $this->notification_service = $notification_service;
+    }
+}
+
+// ❌ 高耦合：直接建立依賴
+class ProductService
+{
+    public function createProduct(array $data)
+    {
+        $repository = new ProductRepository();  // 緊耦合
+        $mailer = new Mailer();  // 緊耦合
+    }
+}
+```
+
+### 耦合度評估指標
+
+| 耦合類型 | 說明 | 等級 |
+|---------|------|------|
+| 無耦合 | 模組完全獨立 | 最佳 |
+| 資料耦合 | 只傳遞基本資料 | 良好 |
+| 訊息耦合 | 透過介面/契約溝通 | 良好 |
+| 控制耦合 | 傳遞控制參數影響行為 | 注意 |
+| 共用耦合 | 共用全域變數 | 避免 |
+| 內容耦合 | 直接存取內部實作 | 禁止 |
+
+---
+
 ## Controller → Service → Repository 分層
 
 ### Controller 層：只處理 HTTP 請求和回應

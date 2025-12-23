@@ -34,32 +34,88 @@ PHP 類別檔案      → PascalCase.php       (ProductController.php)
 
 ---
 
-## 快速指令卡片
+## 高內聚低耦合檢查
 
-### 新功能開發
-```bash
-/speckit.specify [描述] → /speckit.plan → /speckit.tasks → /speckit.implement
-MCP: 自動使用 context7 + tailwindcss-mcp-server
+```
+高內聚：
+✅ 類別只負責單一職責
+✅ 方法只做一件事
+✅ 方法不超過 50 行
+❌ 避免萬能類別 (God Class)
+
+低耦合：
+✅ 使用依賴注入 (DI)
+✅ 依賴介面而非具體類別
+✅ 遵循分層架構
+❌ 禁止直接 new 其他 Service
+❌ 禁止跨層存取
 ```
 
-### 新模組建立（TDD）
-```bash
-base-template-generator (context7) → tester (context7) → coder (context7 + tailwindcss-mcp-server) → reviewer
+---
+
+## 快速指令卡片
+
+> **核心原則：** Sequential Thinking → BDD → Spec → TDD → Code
+
+### 新功能開發
+```
+0. Sequential Thinking - 分析需求
+1. /bdd - 定義行為（Given/When/Then）
+2. /backend-spec - 產生後端規格
+3. /frontend-spec - 產生前端規格（如有 UI）
+4. /tdd - 先寫測試（紅燈）
+5. coder - 實作（綠燈→重構）
+6. reviewer - 審查
+7. /review-staged - 提交前審查
 ```
 
 ### Bug 修復
-```bash
-researcher → tester (context7, 寫測試重現 bug) → coder (context7, 修復) → reviewer (context7)
+```
+0. Sequential Thinking - 分析問題根因
+1. /impact-analysis - 評估影響範圍
+2. /tdd - 先寫失敗測試重現 bug
+3. coder - 修復讓測試通過
+4. reviewer - 審查
+5. /review-staged - 提交前審查
 ```
 
-### 重構（TDD）
-```bash
-/speckit.specify [描述] → tester (context7, 回歸測試) → coder (context7, 重構) → reviewer (context7)
+### UI 開發
+```
+0. Sequential Thinking - 分析 UI 需求
+1. /components - 列出可用共用組件
+2. /bdd - 定義 UI 行為
+3. /frontend-spec - 產生前端規格
+4. /tdd - 先寫 Feature Test
+5. coder - 實作 UI（使用共用組件）
+6. reviewer - 審查
+7. /review-staged - 提交前審查
 ```
 
-### UI 元件開發
-```bash
-/components → ui-designer → component-architect → coder (context7 + tailwindcss-mcp-server) → reviewer
+### 重構
+```
+0. Sequential Thinking - 分析重構策略
+1. /impact-analysis - 評估影響範圍
+2. /tdd - 先寫回歸測試
+3. coder - 重構（保持測試通過）
+4. reviewer - 審查
+5. /review-staged - 提交前審查
+```
+
+### 組件相關
+```
+0. Sequential Thinking - 分析組件需求
+1. /components - 掃描現有組件
+2. /impact-analysis - 評估修改影響
+3. /tdd - 撰寫組件測試
+4. coder - 實作組件
+5. reviewer - 審查
+6. /review-staged - 提交前審查
+```
+
+### 程式碼提交
+```
+1. /review-staged - 審查暫存區變更
+2. 根據審查結果提交或提示修正
 ```
 
 ---
@@ -69,7 +125,6 @@ researcher → tester (context7, 寫測試重現 bug) → coder (context7, 修�
 ```
 規格文件: specs/[功能名稱]/
 Agents: .claude/agents/
-Spec-Kit: .specify/
 Controllers: app/Http/Controllers/
 Models: app/Models/
 Services: app/Services/
@@ -80,19 +135,70 @@ Views: resources/views/
 
 ---
 
+## 完整工具清單
+
+### MCP 工具
+| 工具 | 用途 | 階段 |
+|-----|------|-----|
+| Sequential Thinking | 結構化思考 | **0. 所有任務第一步** |
+| context7 | Laravel/PHP 語法 | 程式碼生成 |
+| tailwindcss-mcp-server | Tailwind CSS | Blade/CSS 生成 |
+
+### Slash Commands
+| 指令 | 用途 | 階段 |
+|-----|------|-----|
+| `/bdd` | 定義行為（Gherkin） | **1. 需求定義** |
+| `/backend-spec` | 後端技術規格 | **2. 技術規格** |
+| `/frontend-spec` | 前端技術規格 | **2. 技術規格** |
+| `/components` | 列出共用組件 | **2. 技術規格（UI）** |
+| `/tdd` | 測試驅動開發 | **3. 測試先行** |
+| `/impact-analysis` | 影響範圍分析 | **修改前評估** |
+| `/review-staged` | 審查暫存區 | **提交前審查** |
+
+### Agents
+
+#### 核心開發 Agents
+| Agent | 用途 | 階段 |
+|-------|------|-----|
+| researcher | 分析現有程式碼結構、研究依賴關係 | 需求研究 |
+| tester | 撰寫測試、驗證品質（支援 TDD） | **3. 測試先行** |
+| coder | 實作程式碼、遵循規範 | **4. 實作（測試後）** |
+| reviewer | 程式碼審查、檢查規範、高內聚低耦合檢查 | **5. 審查** |
+
+#### 架構設計 Agents
+| Agent | 用途 | 階段 |
+|-------|------|-----|
+| system-architect | 系統架構設計、技術選型 | 架構決策 |
+| component-architect | 元件架構設計 | 組件設計 |
+
+#### UI/UX Agents
+| Agent | 用途 | 階段 |
+|-------|------|-----|
+| ui-designer | UI 設計、設計系統 | UI 設計 |
+
+#### 模板與協調 Agents
+| Agent | 用途 | 階段 |
+|-------|------|-----|
+| base-template-generator | 建立基礎模板和樣板程式碼 | 模組初始化 |
+| pr-manager | Pull Request 管理 | 發起 PR |
+
+---
+
 ## 三大開發原則
 
-1. **文件驅動** - 先寫規格 (Spec-Kit)，再寫程式碼
-2. **測試先行** - TDD 確保品質，測試覆蓋率 >80%
+1. **Sequential Thinking 先行** - 所有任務都先用結構化思考分析
+2. **BDD → Spec → TDD → Code** - 先定義行為，再寫規格，先寫測試，再寫程式碼
 3. **持續審查** - 程式碼必須經過 reviewer 才能合併
 
 ---
 
 ## 記住這些關鍵點
 
+- 🧠 **Sequential Thinking** - 所有任務第一步
+- 📝 **BDD 先行** - 先定義行為再寫規格
+- 🧪 **TDD 先行** - 先寫測試再寫程式碼
 - 🔒 **安全第一** - SQL 注入、XSS、CSRF 防護
 - 📝 **註解必備** - 每行程式碼都要有繁體中文註解
 - 🏗️ **分層架構** - Controller → Service → Repository
 - ✅ **錯誤處理** - 所有可能失敗的操作都要 try-catch
 - 🎨 **規範一致** - 嚴格遵守命名規範和程式碼風格
-- 🔄 **流程完整** - 使用 Spec-Kit + Agents 確保品質

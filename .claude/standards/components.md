@@ -123,13 +123,30 @@
 
 ---
 
-## 正確的開發流程
+## 正確的 UI 開發流程
 
-1. **掃描組件** → 執行 `find resources/views/components -name "*.blade.php"`
-2. **選擇組件** → 確認要使用哪些共用組件
-3. **開始開發** → 優先使用共用組件
-4. **遇到問題** → 考慮擴展現有組件（增加參數）
-5. **完全無法重用** → 才創建新組件到 `components/` 資料夾
+> **核心原則：** Sequential Thinking → /components → /bdd → /frontend-spec → /tdd → coder
+
+```
+0. Sequential Thinking - 分析 UI 需求
+1. /components - 列出可用共用組件
+2. /bdd - 定義 UI 行為（Given/When/Then）
+3. /frontend-spec - 產生前端規格
+4. /tdd - 先寫 Feature Test
+5. coder - 實作 UI（使用共用組件）
+6. reviewer - 審查
+7. /review-staged - 提交前審查
+```
+
+**詳細步驟：**
+1. **分析需求** → 使用 Sequential Thinking 分析 UI 需求
+2. **掃描組件** → 執行 `/components` 列出可用組件
+3. **定義行為** → 使用 `/bdd` 定義 UI 行為
+4. **產生規格** → 使用 `/frontend-spec` 產生前端規格
+5. **撰寫測試** → 使用 `/tdd` 先寫 Feature Test
+6. **實作 UI** → 優先使用共用組件
+7. **遇到問題** → 考慮擴展現有組件（增加參數）
+8. **完全無法重用** → 才創建新組件到 `components/` 資料夾
 
 ---
 
@@ -137,7 +154,11 @@
 
 **當 AI (Claude) 開發 UI 時，必須遵循：**
 
-1. **第一步：** 使用 `/components` 列出可用組件
-2. **第二步：** 在回應中明確說明使用了哪些共用組件
-3. **第三步：** 如果沒有合適的組件，必須說明原因
-4. **第四步：** 只有在無法使用現有組件時，才能創建新組件
+1. **第一步：** 使用 Sequential Thinking 分析 UI 需求
+2. **第二步：** 使用 `/components` 列出可用組件
+3. **第三步：** 使用 `/bdd` 定義 UI 行為
+4. **第四步：** 使用 `/frontend-spec` 產生前端規格
+5. **第五步：** 使用 `/tdd` 先寫 Feature Test
+6. **第六步：** 在實作中明確說明使用了哪些共用組件
+7. **第七步：** 如果沒有合適的組件，必須說明原因
+8. **第八步：** 只有在無法使用現有組件時，才能創建新組件
