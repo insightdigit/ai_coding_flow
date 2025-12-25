@@ -56,13 +56,13 @@ description: 測試開發流程。當用戶提到「測試」「test」「TDD」
 ## 測試類型
 
 ### Unit Test
-測試單一類別/方法，mock 依賴。
+測試單一類別/方法。
 - Service 方法
 - Repository 方法
 - Model 方法
 
 ### Feature Test
-測試完整 HTTP 請求流程，使用 `RefreshDatabase`。
+測試完整 HTTP 請求流程。
 - API 端點回應
 - Controller 行為
 - 驗證規則
@@ -73,7 +73,6 @@ description: 測試開發流程。當用戶提到「測試」「test」「TDD」
 - 避免測試 Blade 視圖渲染結果
 
 ## 品質要求
-
 - 測試覆蓋率 > 80%（後端邏輯）
 - 遵循 AAA 模式（Arrange-Act-Assert）
 - 測試名稱清楚描述行為

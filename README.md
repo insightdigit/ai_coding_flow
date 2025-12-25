@@ -1,8 +1,8 @@
-# AI 開發流程新人手冊
+# AI 輔助開發流程指南
 
-> **版本:** 1.0 | **最後更新:** 2025-12-23
+> **版本:** 2.0 | **最後更新:** 2025-12-26
 >
-> 歡迎加入團隊！本手冊將幫助你快速了解如何使用 Claude Code 的 AI 輔助開發流程。
+> 使用 Claude Code 的 AI 輔助開發完整指南
 
 ---
 
@@ -14,9 +14,10 @@
 4. [Skills（自動流程）](#skills自動流程)
 5. [Commands（指令）](#commands指令)
 6. [Agents（代理）](#agents代理)
-7. [常見開發場景](#常見開發場景)
-8. [最佳實踐](#最佳實踐)
-9. [FAQ](#faq)
+7. [MCP 工具](#mcp-工具)
+8. [常見開發場景](#常見開發場景)
+9. [最佳實踐](#最佳實踐)
+10. [FAQ](#faq)
 
 ---
 
@@ -45,7 +46,7 @@ Controller (處理 HTTP) → Service (商業邏輯) → Repository (資料存取
 ```
 「我要開發一個產品管理功能」  → AI 自動執行新功能開發流程
 「這個 bug 需要修復」        → AI 自動執行 bug 修復流程
-「幫我做一個訂單列表頁面」   → AI 自動執行 UI 開發流程
+「幫我重構這段程式碼」       → AI 自動執行重構流程
 ```
 
 ---
@@ -66,7 +67,7 @@ Controller (處理 HTTP) → Service (商業邏輯) → Repository (資料存取
                 ┌┴───────────────┴┐
                 │      BDD        │  ← 行為定義
                ┌┴─────────────────┴┐
-               │ Sequential Thinking│  ← 結構化分析
+               │       PRD         │  ← 產品需求文件
                └───────────────────┘
 ```
 
@@ -74,34 +75,28 @@ Controller (處理 HTTP) → Service (商業邏輯) → Repository (資料存取
 
 ```
 .claude/
-├── skills/           # 自動觸發的工作流程（6 個）
+├── skills/           # 自動觸發的工作流程（4 個）
 │   ├── new-feature/  # 新功能開發
 │   ├── bug-fix/      # Bug 修復
 │   ├── testing/      # 測試開發
-│   ├── ui-dev/       # UI/前端開發
-│   ├── architecture/ # 架構設計
 │   └── refactor/     # 重構/優化
 │
 ├── commands/         # 明確調用的指令（8 個）
+│   ├── create-prd.md     # 產品需求文件
 │   ├── bdd.md            # 行為驅動開發
+│   ├── backend-spec.md   # 後端規格
+│   ├── frontend-spec.md  # 前端規格
 │   ├── tdd.md            # 測試驅動開發
 │   ├── components.md     # 掃描共用組件
 │   ├── impact-analysis.md # 影響範圍分析
-│   ├── review-staged.md  # 審查暫存區
-│   ├── backend-spec.md   # 後端規格
-│   ├── frontend-spec.md  # 前端規格
-│   └── bug-fix.md        # Bug 修復
+│   └── review-staged.md  # 審查暫存區
 │
-├── agents/           # AI 代理
-│   └── core/
-│       ├── researcher.md # 研究分析
-│       ├── coder.md      # 程式碼實作
-│       ├── tester.md     # 測試撰寫
-│       └── reviewer.md   # 程式碼審查
+├── agents/           # AI 代理（2 個）
+│   ├── coder.md      # 程式碼實作
+│   └── ui-designer.md # UI 設計
 │
 └── standards/        # 開發規範
-    ├── workflow.md       # 工作流程
-    ├── architecture.md   # 架構模式
+    ├── backend.md        # 後端規範
     ├── naming.md         # 命名規範
     ├── coding-style.md   # 程式碼風格
     ├── security.md       # 安全規範
@@ -121,33 +116,6 @@ Controller (處理 HTTP) → Service (商業邏輯) → Repository (資料存取
 | **Commands** | 手動（輸入 `/指令`） | 特定任務 |
 | **Agents** | 由 AI 調用 | 專業任務執行 |
 
-### 工具關係圖
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        用戶輸入                              │
-│  「我要開發產品管理功能」                                     │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Skills（自動識別）                          │
-│  ✓ 偵測到「開發」→ 觸發 new-feature Skill                     │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Commands（按順序執行）                      │
-│  1. /bdd → 2. /backend-spec → 3. /tdd → ...                 │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Agents（執行任務）                          │
-│  researcher → tester → coder → reviewer                      │
-└─────────────────────────────────────────────────────────────┘
-```
-
 ---
 
 ## Skills（自動流程）
@@ -156,16 +124,14 @@ Controller (處理 HTTP) → Service (商業邏輯) → Repository (資料存取
 
 Skills 是**自動觸發的完整開發流程**。當你的訊息包含特定關鍵字時，AI 會自動識別並執行對應的流程。
 
-### 六大 Skills 一覽
+### 四大 Skills 一覽
 
 | Skill | 觸發關鍵字 | 執行流程 |
 |-------|-----------|----------|
-| **new-feature** | 新功能、新增、開發、實作、建立 | BDD → TDD → Code → Review |
+| **new-feature** | 新功能、新增、開發、實作、建立 | PRD → Spec → BDD → TDD → Code → Review |
 | **bug-fix** | bug、錯誤、問題、修復、fix、壞掉 | 分析 → 影響評估 → TDD → 修復 → Review |
-| **testing** | 測試、test、TDD、單元測試 | 分析 → TDD → 實作 → Review |
-| **ui-dev** | 頁面、表單、畫面、UI、前端、介面 | 掃描組件 → BDD → TDD → 實作 → Review |
-| **architecture** | 架構、設計、評估、比較、方案 | 深度分析 → 方案比較 → 架構審查 |
-| **refactor** | 重構、優化、調整、改善、拆分、效能 | 影響分析 → 回歸測試 → 重構 → Review |
+| **testing** | 測試、test、TDD、單元測試、Feature Test | 分析 → TDD → 實作 → Review |
+| **refactor** | 重構、優化、調整、改善、瘦身、拆分、效能 | 影響分析 → 回歸測試 → 重構 → Review |
 
 ### 使用範例
 
@@ -189,46 +155,167 @@ Commands 是**手動調用的指令**，用於執行特定任務。使用方式�
 
 ### 八大 Commands 詳解
 
-#### 1. `/bdd` - 行為驅動開發
+#### 1. `/create-prd` - 產品需求文件
 
-**用途：** 用 Gherkin 語法定義功能行為
+**用途：** 建立產品需求文件（PRD）
 
-**使用時機：** 開發新功能前，先定義預期行為
+**使用時機：** 開發新功能前，先定義產品需求
 
 **範例：**
 ```
-/bdd 使用者登入功能
-```
+/create-prd 會員點數系統
 
-**輸出：**
-```gherkin
-# language: zh-TW
-功能: 使用者登入
-  作為一個訪客
-  我想要登入系統
-  以便存取個人資料
+需求背景：
+- 目前會員沒有忠誠度機制，回購率偏低
+- 希望透過點數獎勵提高會員黏著度
 
-  場景: 使用有效憑證登入
-    假設 我在登入頁面
-    當 我輸入帳號 "test@example.com"
-    而且 我輸入密碼 "password"
-    而且 我點擊登入按鈕
-    那麼 我應該看到 "歡迎回來"
+核心功能：
+- 消費累積點數（每 100 元 = 1 點）
+- 點數可折抵消費（每 10 點 = 1 元）
+- 點數有效期限 1 年
+- 會員可查看點數餘額和歷史紀錄
+
+使用者角色：
+- 一般會員：累積、使用、查詢點數
+- 管理員：調整點數規則、手動補發點數
 ```
 
 ---
 
-#### 2. `/tdd` - 測試驅動開發
+#### 2. `/bdd` - 行為驅動開發
 
-**用途：** 執行 TDD 流程（紅燈 → 綠燈 → 重構）
+**用途：** 用 Gherkin 語法定義功能行為
 
-**使用時機：** 開發任何功能前
+**使用時機：** 定義 PRD 後，撰寫行為規格
 
 **範例：**
 ```
-/tdd ProductService::createProduct
-/tdd unit ProductRepository::getActiveProducts
-/tdd feature 產品列表 API
+/bdd 點數折抵功能
+
+場景需求：
+- 結帳時可選擇使用點數折抵
+- 折抵金額不能超過訂單金額的 50%
+- 點數不足時顯示提示訊息
+- 折抵後顯示實際付款金額
+
+邊界條件：
+- 點數餘額為 0 時，折抵選項應該 disabled
+- 訂單金額低於 100 元時不能使用點數
+```
+
+**輸出範例：**
+```gherkin
+# language: zh-TW
+功能: 點數折抵
+  作為一個會員
+  我想要使用點數折抵消費金額
+  以便節省購物支出
+
+  場景: 成功使用點數折抵
+    假設 我的點數餘額為 500 點
+    而且 我的購物車金額為 1000 元
+    當 我選擇使用 100 點折抵
+    那麼 折抵金額應為 10 元
+    而且 應付金額應為 990 元
+    而且 點數餘額應更新為 400 點
+
+  場景: 折抵金額超過上限
+    假設 我的點數餘額為 10000 點
+    而且 我的購物車金額為 500 元
+    當 我嘗試使用 5000 點折抵
+    那麼 應顯示錯誤「折抵金額不能超過訂單金額的 50%」
+    而且 最多只能折抵 250 元
+```
+
+---
+
+#### 3. `/backend-spec` - 後端規格
+
+**用途：** 撰寫後端技術規格文檔
+
+**使用時機：** 定義 BDD 後，規劃後端架構
+
+**範例：**
+```
+/backend-spec 會員點數系統
+
+功能範圍：
+- 點數累積（訂單完成後自動累積）
+- 點數使用（結帳時折抵）
+- 點數查詢（餘額、歷史紀錄）
+- 點數過期處理（每日排程檢查）
+
+已知限制：
+- 需要與現有 Order、Member Model 整合
+- 點數變動需要記錄完整的異動歷程
+- 要考慮高併發下的點數扣減問題
+```
+
+**產出內容：**
+- 資料表設計（points、point_transactions）
+- Model 規格（$fillable、關聯、Scope）
+- Repository 方法（getBalance、getHistory）
+- Service 方法與流程（earn、redeem、expire）
+- Controller 設計
+- 驗證規則
+
+---
+
+#### 4. `/frontend-spec` - 前端規格
+
+**用途：** 撰寫前端技術規格文檔
+
+**使用時機：** 開發 UI 前，定義頁面架構
+
+**範例：**
+```
+/frontend-spec 會員點數頁面
+
+頁面清單：
+1. 點數總覽頁 - 顯示目前餘額、即將過期點數、快速連結
+2. 點數歷史頁 - 列出所有累積/使用/過期紀錄，支援日期篩選
+3. 結帳點數折抵區塊 - 嵌入現有結帳頁面
+
+設計需求：
+- 點數餘額要夠醒目（大字體、主色調）
+- 即將過期的點數用警示色標示
+- 歷史紀錄用不同顏色區分累積(綠)/使用(藍)/過期(灰)
+- 手機版要能正常操作
+```
+
+**產出內容：**
+- 頁面結構圖（版面配置、區塊劃分）
+- 組件使用清單（需要用到哪些共用組件）
+- 表單欄位定義（輸入框、選單等）
+- 使用者操作流程（點擊路徑、互動行為）
+
+---
+
+#### 5. `/tdd` - 測試驅動開發
+
+**用途：** 執行 TDD 流程（紅燈 → 綠燈 → 重構）
+
+**使用時機：** 定義規格後，開始實作前
+
+**範例：**
+```
+/tdd PointService 點數折抵功能
+
+測試案例：
+1. 正常折抵 - 100 點折抵 10 元
+2. 餘額不足 - 點數不夠時拋出例外
+3. 超過上限 - 折抵金額超過訂單 50% 時拋出例外
+4. 併發處理 - 同時扣減點數時不會超扣
+
+相關方法：
+- redeem(int $member_id, int $points, int $order_id): PointTransaction
+- validateRedemption(int $member_id, int $points, int $order_amount): bool
+```
+
+**其他範例：**
+```
+/tdd unit PointRepository::getBalance
+/tdd feature POST /api/points/redeem
 ```
 
 **流程：**
@@ -236,13 +323,9 @@ Commands 是**手動調用的指令**，用於執行特定任務。使用方式�
 2. **綠燈** - 寫最少程式碼讓測試通過
 3. **重構** - 改善程式碼，保持測試通過
 
-**⚠️ 重要限制：**
-- TDD 只測試**後端邏輯**
-- 不測試 Blade 視圖、HTML、CSS、JavaScript
-
 ---
 
-#### 3. `/components` - 掃描共用組件
+#### 6. `/components` - 掃描共用組件
 
 **用途：** 列出所有可用的共用 Blade 組件
 
@@ -267,23 +350,16 @@ UI 組件
 ├── x-page-header    頁面標題
 ├── x-breadcrumb     麵包屑
 ├── x-status-badge   狀態標籤
-├── x-alert          提示訊息
-├── x-button         按鈕
-└── x-section-card   區塊容器
+└── x-section        區塊容器
 
 操作組件
 ├── x-action-buttons 操作按鈕組（查看/編輯/刪除）
 └── x-back-button    返回按鈕
 ```
 
-**⚠️ 禁止行為：**
-- ❌ 不執行 `/components` 就開始寫 UI
-- ❌ 手動寫 `<input>`, `<select>`, `<textarea>`
-- ❌ 重複創建已存在的組件
-
 ---
 
-#### 4. `/impact-analysis` - 影響範圍分析
+#### 7. `/impact-analysis` - 影響範圍分析
 
 **用途：** 分析程式碼變更的影響範圍
 
@@ -291,20 +367,34 @@ UI 組件
 
 **範例：**
 ```
-/impact-analysis app/Services/ProductService.php
-/impact-analysis ProductService::createProduct
-/impact-analysis "修改產品價格計算邏輯"
+/impact-analysis OrderService::calculateTotal
+
+變更內容：
+- 要在 calculateTotal 方法中加入點數折抵邏輯
+- 需要新增 $points_to_redeem 參數
+- 回傳值要包含折抵金額明細
+
+擔心的問題：
+- 不確定有多少地方呼叫這個方法
+- 改了參數會不會影響現有功能
+- 有哪些測試需要更新
+```
+
+**其他範例：**
+```
+/impact-analysis app/Models/Order.php
+/impact-analysis Member::points 關聯
 ```
 
 **輸出內容：**
-- 依賴關係圖（誰依賴這個、這個依賴誰）
-- 受影響的檔案清單
-- 需要執行的測試
-- 風險等級評估
+- 依賴關係圖（誰呼叫這個方法/類別）
+- 受影響的檔案清單（Controller、View、其他 Service）
+- 需要執行的測試（列出相關測試檔案）
+- 風險等級評估（低/中/高 + 建議）
 
 ---
 
-#### 5. `/review-staged` - 審查暫存區
+#### 8. `/review-staged` - 審查暫存區
 
 **用途：** 對 Git 暫存區的變更進行程式碼審查
 
@@ -325,71 +415,6 @@ UI 組件
 
 ---
 
-#### 6. `/backend-spec` - 後端規格
-
-**用途：** 撰寫後端技術規格文檔
-
-**使用時機：** 開發新功能前，定義後端架構
-
-**範例：**
-```
-/backend-spec 產品管理
-/backend-spec 訂單模組 - 建立訂單、取消訂單
-```
-
-**產出內容：**
-- 資料表設計
-- Model 規格（$fillable、關聯、Scope）
-- Repository 方法
-- Service 方法與流程
-- Controller 設計
-- 驗證規則
-
----
-
-#### 7. `/frontend-spec` - 前端規格
-
-**用途：** 撰寫前端技術規格文檔
-
-**使用時機：** 開發 UI 前，定義頁面架構
-
-**範例：**
-```
-/frontend-spec 產品管理頁面
-/frontend-spec 訂單列表頁、訂單表單頁
-```
-
-**產出內容：**
-- 頁面結構圖
-- 組件使用清單
-- 表單欄位定義
-- 使用者操作流程
-- 樣式規格
-
----
-
-#### 8. `/bug-fix` - Bug 修復
-
-**用途：** 執行標準化的 Bug 修復流程
-
-**使用時機：** 修復 Bug 時
-
-**範例：**
-```
-/bug-fix 產品列表載入很慢
-/bug-fix app/Services/ProductService.php 價格計算錯誤
-/bug-fix "Call to undefined method" ProductController
-```
-
-**流程：**
-1. Sequential Thinking - 分析問題根因
-2. Impact Analysis - 評估修改影響
-3. TDD - 撰寫測試重現 Bug
-4. 修復 - 讓測試通過
-5. Review - 程式碼審查
-
----
-
 ## Agents（代理）
 
 ### 什麼是 Agents？
@@ -397,22 +422,6 @@ UI 組件
 Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常由 AI 在執行 Skill 時自動調用。
 
 ### 核心 Agents
-
-#### 🔍 Researcher（研究員）
-
-**職責：** 深度分析程式碼、研究依賴關係、找出模式
-
-**何時被調用：**
-- 開始任何新任務前
-- 需要了解現有程式碼結構時
-
-**分析內容：**
-- 程式碼結構和模式
-- 依賴關係
-- 現有實作方式
-- 建議和改進點
-
----
 
 #### 💻 Coder（工程師）
 
@@ -430,35 +439,40 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 
 ---
 
-#### 🧪 Tester（測試員）
+#### 🎨 UI Designer（UI 設計師）
 
-**職責：** 撰寫全面的測試案例
+**職責：** 設計直觀且美觀的使用者介面
 
 **何時被調用：**
-- TDD 紅燈階段（撰寫測試）
-- 需要補充測試時
+- 開發前端頁面時
+- 設計 UI 組件時
 
-**測試類型：**
-- Unit Test（Service、Repository）
-- Feature Test（Controller、API）
-- 遵循 AAA 模式（Arrange-Act-Assert）
+**遵循原則：**
+- 優先使用共用組件
+- 遵循 Tailwind CSS 規範
+- 響應式設計
 
 ---
 
-#### 👀 Reviewer（審查員）
+## MCP 工具
 
-**職責：** 程式碼審查、品質把關
+### 什麼是 MCP 工具？
 
-**何時被調用：**
-- 程式碼實作完成後
-- 提交前
+MCP (Model Context Protocol) 工具是增強 AI 能力的外部服務。
 
-**審查項目：**
-- 功能正確性
-- 安全性（SQL 注入、XSS）
-- 效能（N+1 問題）
-- 架構合規（分層）
-- 程式碼品質（命名、註解）
+### 可用的 MCP 工具
+
+| 工具 | 用途 | 連結 |
+|-----|------|------|
+| **Sequential Thinking** | 結構化思考、問題分解 | [Smithery](https://smithery.ai/server/@smithery-ai/server-sequential-thinking) |
+| **Tailwind CSS MCP** | Tailwind CSS 樣式生成 | [NPM](https://www.npmjs.com/package/tailwindcss-mcp-server) |
+| **Context7 MCP** | 提供最新的文檔內容 | [Smithery](https://smithery.ai/server/@upstash/context7-mcp) |
+
+### 使用時機
+
+- **Sequential Thinking**：分析複雜問題、拆解需求、規劃架構
+- **Tailwind CSS MCP**：查詢 Tailwind 類別、轉換 CSS
+- **Context7 MCP**：獲取最新的程式庫文檔
 
 ---
 
@@ -466,92 +480,240 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 
 ### 場景 A：新功能開發
 
-**你說：**
+**AI 會先判斷功能類型，再執行對應流程：**
+
+#### A-1：純後端功能（API、排程、資料處理）
+
+**範例 prompt：**
 ```
-「幫我開發一個產品管理系統」
+幫我開發一個「訂單匯出」功能：
+- 管理員可以選擇日期範圍匯出訂單資料
+- 支援 CSV 和 Excel 兩種格式
+- 大量資料時使用背景任務處理，完成後發 Email 通知
+- 匯出檔案保留 7 天後自動刪除
 ```
 
-**AI 自動執行：**
+**執行流程：**
 ```
-1. Sequential Thinking → 分析需求
-2. /bdd              → 定義行為（Given/When/Then）
-3. /backend-spec     → 產生後端規格
-4. /frontend-spec    → 產生前端規格
-5. /tdd              → 先寫測試（紅燈）
-6. coder agent       → 實作（綠燈→重構）
-7. reviewer agent    → 審查
-8. /review-staged    → 提交前審查
+1. Sequential Thinking → 分析需求、判斷類型
+2. /create-prd        → 建立產品需求文件
+3. /backend-spec      → 產生後端規格
+4. /bdd               → 定義行為（Given/When/Then）
+5. /tdd               → 先寫測試（紅燈）
+6. coder agent        → 實作（綠燈→重構）
+7. reviewer agent     → 程式碼審查
+```
+
+#### A-2：純前端功能（頁面、樣式、組件）
+
+**範例 prompt：**
+```
+幫我優化「產品列表」頁面的 UI：
+- 目前表格太擠，希望增加欄位間距
+- 新增「批次操作」功能列（勾選多筆後可批次刪除、批次上架）
+- 狀態欄位改用顏色標籤顯示（上架=綠色、下架=灰色、缺貨=紅色）
+- 手機版要能正常瀏覽，表格改成卡片式呈現
+```
+
+**執行流程：**
+```
+1. Sequential Thinking → 分析需求、判斷類型
+2. /create-prd        → 建立產品需求文件
+3. /frontend-spec     → 產生前端規格
+4. /components        → 掃描可用組件
+5. ui-designer agent  → 設計 UI
+6. coder agent        → 實作程式碼
+7. reviewer agent     → 程式碼審查
+```
+
+#### A-3：全端功能（完整 CRUD、新模組）
+
+**範例 prompt：**
+```
+幫我開發一個「優惠券管理」模組：
+
+功能需求：
+- 管理員可以建立、編輯、刪除優惠券
+- 優惠券類型：固定金額折扣、百分比折扣、免運費
+- 可設定使用條件：最低消費金額、指定商品類別、會員等級限定
+- 可設定使用期限和總使用次數上限
+
+頁面需求：
+- 優惠券列表頁（含搜尋、篩選、分頁）
+- 優惠券新增/編輯表單頁
+- 優惠券使用紀錄查詢頁
+```
+
+**執行流程：**
+```
+1. Sequential Thinking → 分析需求、判斷類型
+2. /create-prd        → 建立產品需求文件
+3. /backend-spec      → 產生後端規格
+4. /frontend-spec     → 產生前端規格
+5. /bdd               → 定義行為（Given/When/Then）
+6. /tdd               → 先寫測試（紅燈）
+7. ui-designer agent  → 設計 UI
+8. coder agent        → 實作（綠燈→重構）
+9. reviewer agent     → 程式碼審查
 ```
 
 ---
 
 ### 場景 B：Bug 修復
 
-**你說：**
+**AI 會先判斷 Bug 類型，再執行對應流程：**
+
+#### B-1：純後端 Bug（邏輯錯誤、資料問題）
+
+**範例 prompt：**
 ```
-「產品價格計算錯誤，應該是 100 但顯示 90」
+訂單金額計算有 bug：
+
+問題描述：
+- 當使用「滿千折百」優惠券時，折扣金額計算錯誤
+- 訂單金額 1500 元，應該折 100 元，但實際折了 150 元
+
+重現步驟：
+1. 建立一張 1500 元的訂單
+2. 套用優惠券代碼 "SAVE100"
+3. 查看訂單金額，顯示 1350 元（應該是 1400 元）
+
+相關程式碼應該在 OrderService 的 calculateDiscount 方法
 ```
 
-**AI 自動執行：**
+**執行流程：**
 ```
-1. Sequential Thinking → 分析問題根因
+1. Sequential Thinking → 分析問題根因、判斷類型
 2. /impact-analysis    → 評估影響範圍
 3. /tdd               → 先寫失敗測試重現 bug
 4. coder agent        → 修復讓測試通過
-5. reviewer agent     → 審查
-6. /review-staged     → 提交前審查
+5. reviewer agent     → 程式碼審查
+```
+
+#### B-2：純前端 Bug（顯示問題、樣式錯誤）
+
+**範例 prompt：**
+```
+產品列表頁面在手機上顯示異常：
+
+問題描述：
+- iPhone 14 (390px 寬) 上，表格欄位重疊無法閱讀
+- 操作按鈕被切掉一半
+- 分頁元件跑到畫面外
+
+預期行為：
+- 手機版應該改成卡片式排列
+- 每張卡片顯示：圖片、名稱、價格、狀態、操作按鈕
+- 分頁改成「上一頁/下一頁」簡化版
+
+請檢查 resources/views/admin/products/index.blade.php
+```
+
+**執行流程：**
+```
+1. Sequential Thinking → 分析問題根因、判斷類型
+2. /impact-analysis    → 評估影響範圍
+3. /components        → 確認共用組件使用
+4. ui-designer agent  → 修正 UI
+5. coder agent        → 實作修復
+6. reviewer agent     → 程式碼審查
+```
+
+#### B-3：全端 Bug（資料傳遞、渲染問題）
+
+**範例 prompt：**
+```
+編輯產品後，頁面顯示的資料沒有更新：
+
+問題描述：
+- 在編輯頁修改產品名稱後按儲存
+- 系統顯示「儲存成功」
+- 但回到列表頁，產品名稱還是舊的
+- 重新整理頁面後才會顯示新名稱
+
+重現步驟：
+1. 進入產品編輯頁 /admin/products/1/edit
+2. 修改產品名稱為「新名稱」
+3. 點擊儲存，顯示成功訊息
+4. 頁面自動跳轉回列表，但名稱還是舊的
+
+懷疑是 Controller redirect 後沒有清除快取，或是前端沒有重新載入資料
+```
+
+**執行流程：**
+```
+1. Sequential Thinking → 分析問題根因、判斷類型
+2. /impact-analysis    → 評估影響範圍
+3. /tdd               → 先寫失敗測試重現 bug
+4. ui-designer agent  → 修正 UI（如需要）
+5. coder agent        → 修復讓測試通過
+6. reviewer agent     → 程式碼審查
 ```
 
 ---
 
-### 場景 C：UI 開發
+### 場景 C：測試開發
 
-**你說：**
+**範例 prompt：**
 ```
-「幫我做一個產品列表頁面」
+幫我補齊 OrderService 的單元測試：
+
+目前情況：
+- OrderService 有 8 個 public 方法
+- 只有 createOrder 和 cancelOrder 有寫測試
+- 測試覆蓋率只有 25%
+
+需要測試的方法：
+1. calculateTotal() - 計算訂單總額（含稅、折扣）
+2. applyDiscount() - 套用優惠券折扣
+3. validateStock() - 驗證庫存是否足夠
+4. updateStatus() - 更新訂單狀態（需測試狀態轉換規則）
+
+請特別注意邊界條件：
+- 折扣金額不能超過訂單金額
+- 庫存為 0 時應該拋出例外
+- 狀態只能按照 pending → processing → shipped → completed 順序轉換
 ```
 
-**AI 自動執行：**
+**執行流程：**
 ```
-1. Sequential Thinking → 分析 UI 需求
-2. /components        → 列出可用共用組件 ⚠️ 必須
-3. /bdd              → 定義 UI 行為
-4. /frontend-spec    → 產生前端規格
-5. /tdd              → 先寫 Feature Test
-6. coder agent       → 實作 UI（使用共用組件）
-7. reviewer agent    → 審查
+1. Sequential Thinking → 分析測試範圍（限後端邏輯）
+2. /tdd               → 撰寫測試案例
+3. coder agent        → 確保測試通過
+4. reviewer agent     → 審查測試品質
 ```
 
 ---
 
 ### 場景 D：重構
 
-**你說：**
+**範例 prompt：**
 ```
-「幫我重構 ProductService，把計算邏輯拆出來」
+幫我重構 OrderService，目前程式碼有以下問題：
+
+現況問題：
+- createOrder 方法超過 200 行，做太多事情
+- 價格計算邏輯散落在多個方法中，重複且難維護
+- 庫存檢查和扣減邏輯耦合在一起
+
+重構目標：
+1. 把 createOrder 拆分成多個小方法
+2. 抽出 PriceCalculator 類別，統一處理價格計算
+3. 抽出 StockManager 類別，處理庫存相關邏輯
+4. 確保重構後所有現有測試仍然通過
+
+相關檔案：
+- app/Services/OrderService.php（主要重構目標）
+- tests/Unit/Services/OrderServiceTest.php（現有測試）
 ```
 
-**AI 自動執行：**
+**執行流程：**
 ```
 1. Sequential Thinking → 分析重構策略
-2. /impact-analysis   → 評估影響範圍 ⚠️ 必須
+2. /impact-analysis   → 評估影響範圍
 3. /tdd              → 先寫回歸測試
 4. coder agent       → 重構（保持測試通過）
 5. reviewer agent    → 審查
-```
-
----
-
-### 場景 E：快速修改
-
-**你說：**
-```
-「直接幫我改這個方法名稱」
-```
-
-**AI 執行：**
-```
-直接編輯，不執行完整流程
 ```
 
 ---
@@ -623,6 +785,7 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 - 需要單獨掃描組件：`/components`
 - 需要單獨分析影響：`/impact-analysis`
 - 需要單獨審查：`/review-staged`
+- 需要建立需求文件：`/create-prd`
 
 ---
 
@@ -641,19 +804,7 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 
 ---
 
-### Q3：Skills 和 Commands 有什麼差別？
-
-**A：**
-
-| 比較 | Skills | Commands |
-|-----|--------|----------|
-| 觸發方式 | 自動（根據關鍵字） | 手動（輸入 `/指令`） |
-| 範圍 | 完整流程 | 單一任務 |
-| 範例 | 說「開發產品功能」觸發 new-feature | 輸入 `/components` 掃描組件 |
-
----
-
-### Q4：我的任務沒有被自動識別怎麼辦？
+### Q3：我的任務沒有被自動識別怎麼辦？
 
 **A：** 嘗試使用對應的關鍵字：
 
@@ -661,9 +812,7 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 |---------|--------|
 | 新功能 | 新功能、新增、開發、實作、建立 |
 | Bug 修復 | bug、錯誤、問題、修復、fix |
-| UI 開發 | 頁面、表單、畫面、UI、前端 |
 | 重構 | 重構、優化、調整、改善、效能 |
-| 架構 | 架構、設計、評估、比較 |
 | 測試 | 測試、test、TDD、單元測試 |
 
 ---
@@ -678,50 +827,6 @@ Agents 是**專業的 AI 代理**，各自負責特定類型的任務。通常�
 
 ---
 
-## 快速參考卡
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                    AI 開發流程速查                          │
-├────────────────────────────────────────────────────────────┤
-│                                                            │
-│  📝 開發新功能？                                            │
-│     → 說「開發 XXX 功能」，AI 自動執行完整流程              │
-│                                                            │
-│  🐛 修復 Bug？                                              │
-│     → 說「修復 XXX 問題」，AI 自動分析並修復                │
-│                                                            │
-│  🎨 開發 UI？                                               │
-│     → 先執行 /components，再說「做 XXX 頁面」               │
-│                                                            │
-│  🔧 重構程式碼？                                            │
-│     → 說「重構 XXX」，AI 自動分析影響並安全重構             │
-│                                                            │
-│  ✅ 提交程式碼？                                            │
-│     → git add . → /review-staged → git commit              │
-│                                                            │
-├────────────────────────────────────────────────────────────┤
-│                     常用指令                                │
-├────────────────────────────────────────────────────────────┤
-│  /components       掃描可用組件（UI 開發必用）              │
-│  /impact-analysis  分析影響範圍（修改前必用）               │
-│  /review-staged    審查暫存區（提交前必用）                 │
-│  /tdd              測試驅動開發                             │
-│  /bdd              行為驅動開發                             │
-│  /backend-spec     後端規格                                 │
-│  /frontend-spec    前端規格                                 │
-└────────────────────────────────────────────────────────────┘
-```
-
----
-
-**📚 進階閱讀：**
-- [架構規範](/.claude/standards/architecture.md)
-- [工作流程](/.claude/standards/workflow.md)
-- [命名規範](/.claude/standards/naming.md)
-- [安全規範](/.claude/standards/security.md)
-
----
-
 **版本記錄：**
+- v2.0 (2025-12-26): 與 CLAUDE.md v3.1 同步，修正流程與 Skills 定義一致，豐富 Commands 與場景範例
 - v1.0 (2025-12-23): 初版建立

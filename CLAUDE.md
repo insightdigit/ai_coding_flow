@@ -1,8 +1,7 @@
 # Laravel 開發規範 - 核心指引
 
 > Laravel 12 + Blade + Tailwind CSS 全端開發指南
->
-> **版本:** 3.0 | **最後更新:** 2025-12-19
+> **版本:** 3.1 | **最後更新:** 2025-12-26
 
 ---
 
@@ -81,49 +80,15 @@ PHP 類別檔案      → PascalCase.php       (ProductController.php)
 
 ---
 
-## 常用範例
-
-### Controller
-```php
-class ProductController extends Controller
-{
-    private ProductService $product_service;
-
-    public function __construct(ProductService $product_service)
-    {
-        $this->product_service = $product_service;
-    }
-
-    public function index(Request $request)
-    {
-        $filters = $request->only(['category_id', 'keyword']);
-        $products = $this->product_service->getProductList($filters);
-        return view('products.index', compact('products'));
-    }
-}
-```
-
-### Service
-```php
-class ProductService
-{
-    private ProductRepository $product_repository;
-
-    public function getProductList(array $filters = [])
-    {
-        return $this->product_repository->getFilteredProducts($filters);
-    }
-}
-```
-
----
-
 ## 工具清單
 
 ### Slash Commands（明確調用）
 | 指令 | 用途 |
 |-----|------|
+| `/create-prd` | 建立產品需求文件（PRD） |
 | `/bdd` | 定義行為需求（Gherkin） |
+| `/backend-spec` | 產生後端技術規格 |
+| `/frontend-spec` | 產生前端技術規格 |
 | `/components` | 列出可用共用組件 |
 | `/tdd` | 測試驅動開發 |
 | `/impact-analysis` | 分析變更影響範圍 |
@@ -134,14 +99,21 @@ class ProductService
 |-----|------|
 | Sequential Thinking | 結構化思考、問題分解 |
 | tailwindcss-mcp-server | Tailwind CSS 生成 |
+| context-7-mcp | 提供最新的文檔內容 |
 
 ### Agents
 | Agent | 用途 |
 |-------|------|
-| researcher | 分析現有程式碼 |
-| tester | 撰寫測試 |
 | coder | 實作程式碼 |
 | reviewer | 程式碼審查 |
+
+### Skills（自動觸發的工作流程）
+| Skill | 用途 |
+|-------|------|
+| new-feature | 新功能開發流程 |
+| testing | 測試開發流程 |
+| bug-fix | 修復 Bug 流程 |
+| refactor | 重構程式碼流程 |
 
 ---
 
@@ -179,10 +151,11 @@ laravel-project/
 
 ---
 
-**文件版本:** 3.0
-**最後更新:** 2025-12-19
+**文件版本:** 3.1
+**最後更新:** 2025-12-26
 
 **變更記錄:**
+- v3.1 (2025-12-26): 新增 `/create-prd`、`/backend-spec`、`/frontend-spec` 指令
 - v3.0 (2025-12-19): 重構為 Skills 架構，大幅精簡 CLAUDE.md
 - v2.3 (2025-12-17): 新增「AI 工具自動化規則」
 - v2.0 (2025-11-14): 拆分為模組化文件結構
